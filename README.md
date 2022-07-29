@@ -8,6 +8,8 @@ cmake ../src
 cmake --build .
 ```
 
+CMake will detect the compute capabilities of the GPUs in the node where CMake is run. If building on a different node than the one that will be used for benchmarking, specify the compute capabilities by passing `-DCUDA_ARCHS=70;80" (for 7.0 and 8.0) to CMake.
+
 ## Usage
 ```
 $ ./TP06 -h
