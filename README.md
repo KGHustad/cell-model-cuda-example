@@ -68,9 +68,9 @@ Final V values are in the interval [-8.54229956918900655e+01, -8.542299569189006
 ```
 [kghustad@g002 23:38:10 build_a100q (master)*]$ ./TP06 -s RL
 Solving with the RL scheme
-Solved 100 timesteps with 10000000 cells in 0.960482 seconds.
-Throughput: 1.04114e+09 cell steps / second.
-Final V values are in the interval [-8.54229956921292626e+01, -8.54229956921292626e+01]
+Solved 100 timesteps with 10000000 cells in 0.710556 seconds.
+Throughput: 1.40735e+09 cell steps / second.
+Final V values are in the interval [-8.54229956918546520e+01, -8.54229956918546520e+01]
 ```
 ```
 [kghustad@g002 23:38:14 build_a100q (master)*]$ ./TP06 -s GRL1

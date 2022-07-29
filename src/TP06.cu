@@ -751,10 +751,7 @@ __global__ void step_RL(double *d_states, const double t, const double dt,
     const double dXr1_dt = (-Xr1 + xr1_inf) / tau_xr1;
     const double dXr1_dt_linearized = -1. / tau_xr1;
     d_states[padded_num_cells * STATE_Xr1 + thread_ind] =
-            (fabs(dXr1_dt_linearized) > 1.0e-8
-                     ? (-1.0 + exp(dt * dXr1_dt_linearized)) * dXr1_dt / dXr1_dt_linearized
-                     : dt * dXr1_dt)
-            + Xr1;
+            (expm1(dt * dXr1_dt_linearized)) * dXr1_dt / dXr1_dt_linearized + Xr1;
 
     // Expressions for the Xr2 gate component
     const double xr2_inf = 1.0 / (1. + exp(11. / 3. + V / 24.));
@@ -764,10 +761,7 @@ __global__ void step_RL(double *d_states, const double t, const double dt,
     const double dXr2_dt = (-Xr2 + xr2_inf) / tau_xr2;
     const double dXr2_dt_linearized = -1. / tau_xr2;
     d_states[padded_num_cells * STATE_Xr2 + thread_ind] =
-            (fabs(dXr2_dt_linearized) > 1.0e-8
-                     ? (-1.0 + exp(dt * dXr2_dt_linearized)) * dXr2_dt / dXr2_dt_linearized
-                     : dt * dXr2_dt)
-            + Xr2;
+            (expm1(dt * dXr2_dt_linearized)) * dXr2_dt / dXr2_dt_linearized + Xr2;
 
     // Expressions for the Slow time dependent potassium current component
     const double i_Ks = g_Ks * (Xs * Xs) * (-E_Ks + V);
@@ -780,10 +774,7 @@ __global__ void step_RL(double *d_states, const double t, const double dt,
     const double dXs_dt = (-Xs + xs_inf) / tau_xs;
     const double dXs_dt_linearized = -1. / tau_xs;
     d_states[padded_num_cells * STATE_Xs + thread_ind] =
-            (fabs(dXs_dt_linearized) > 1.0e-8
-                     ? (-1.0 + exp(dt * dXs_dt_linearized)) * dXs_dt / dXs_dt_linearized
-                     : dt * dXs_dt)
-            + Xs;
+            (expm1(dt * dXs_dt_linearized)) * dXs_dt / dXs_dt_linearized + Xs;
 
     // Expressions for the Fast sodium current component
     const double i_Na = g_Na * (m * m * m) * (-E_Na + V) * h * j;
@@ -798,10 +789,7 @@ __global__ void step_RL(double *d_states, const double t, const double dt,
     const double dm_dt = (-m + m_inf) / tau_m;
     const double dm_dt_linearized = -1. / tau_m;
     d_states[padded_num_cells * STATE_m + thread_ind] =
-            (fabs(dm_dt_linearized) > 1.0e-8
-                     ? (-1.0 + exp(dt * dm_dt_linearized)) * dm_dt / dm_dt_linearized
-                     : dt * dm_dt)
-            + m;
+            (expm1(dt * dm_dt_linearized)) * dm_dt / dm_dt_linearized + m;
 
     // Expressions for the h gate component
     const double h_inf = 1.0
@@ -815,10 +803,7 @@ __global__ void step_RL(double *d_states, const double t, const double dt,
     const double dh_dt = (-h + h_inf) / tau_h;
     const double dh_dt_linearized = -1. / tau_h;
     d_states[padded_num_cells * STATE_h + thread_ind] =
-            (fabs(dh_dt_linearized) > 1.0e-8
-                     ? (-1.0 + exp(dt * dh_dt_linearized)) * dh_dt / dh_dt_linearized
-                     : dt * dh_dt)
-            + h;
+            (expm1(dt * dh_dt_linearized)) * dh_dt / dh_dt_linearized + h;
 
     // Expressions for the j gate component
     const double j_inf = 1.0
@@ -835,10 +820,7 @@ __global__ void step_RL(double *d_states, const double t, const double dt,
     const double dj_dt = (-j + j_inf) / tau_j;
     const double dj_dt_linearized = -1. / tau_j;
     d_states[padded_num_cells * STATE_j + thread_ind] =
-            (fabs(dj_dt_linearized) > 1.0e-8
-                     ? (-1.0 + exp(dt * dj_dt_linearized)) * dj_dt / dj_dt_linearized
-                     : dt * dj_dt)
-            + j;
+            (expm1(dt * dj_dt_linearized)) * dj_dt / dj_dt_linearized + j;
 
     // Expressions for the Sodium background current component
     const double i_b_Na = g_bna * (-E_Na + V);
@@ -851,7 +833,7 @@ __global__ void step_RL(double *d_states, const double t, const double dt,
     const double i_CaL_fraction =
             (fabs(V_eff) < i_CaL_lim_delta
                      ? 0.5
-                     : F * V_eff / (R * T * (-1. + exp(2. * F * V_eff / (R * T)))));
+                     : F * V_eff / (R * T * (expm1(2. * F * V_eff / (R * T)))));
     const double i_CaL = i_CaL_factors * i_CaL_fraction;
 
     // Expressions for the d gate component
@@ -863,10 +845,7 @@ __global__ void step_RL(double *d_states, const double t, const double dt,
     const double dd_dt = (-d + d_inf) / tau_d;
     const double dd_dt_linearized = -1. / tau_d;
     d_states[padded_num_cells * STATE_d + thread_ind] =
-            (fabs(dd_dt_linearized) > 1.0e-8
-                     ? (-1.0 + exp(dt * dd_dt_linearized)) * dd_dt / dd_dt_linearized
-                     : dt * dd_dt)
-            + d;
+            (expm1(dt * dd_dt_linearized)) * dd_dt / dd_dt_linearized + d;
 
     // Expressions for the f gate component
     const double f_inf = 1.0 / (1. + exp(20. / 7. + V / 7.));
@@ -876,10 +855,7 @@ __global__ void step_RL(double *d_states, const double t, const double dt,
     const double df_dt = (-f + f_inf) / tau_f;
     const double df_dt_linearized = -1. / tau_f;
     d_states[padded_num_cells * STATE_f + thread_ind] =
-            (fabs(df_dt_linearized) > 1.0e-8
-                     ? (-1.0 + exp(dt * df_dt_linearized)) * df_dt / df_dt_linearized
-                     : dt * df_dt)
-            + f;
+            (expm1(dt * df_dt_linearized)) * df_dt / df_dt_linearized + f;
 
     // Expressions for the F2 gate component
     const double f2_inf = 0.33 + 0.67 / (1. + exp(5. + V / 7.));
@@ -888,10 +864,7 @@ __global__ void step_RL(double *d_states, const double t, const double dt,
     const double df2_dt = (-f2 + f2_inf) / tau_f2;
     const double df2_dt_linearized = -1. / tau_f2;
     d_states[padded_num_cells * STATE_f2 + thread_ind] =
-            (fabs(df2_dt_linearized) > 1.0e-8
-                     ? (-1.0 + exp(dt * df2_dt_linearized)) * df2_dt / df2_dt_linearized
-                     : dt * df2_dt)
-            + f2;
+            (expm1(dt * df2_dt_linearized)) * df2_dt / df2_dt_linearized + f2;
 
     // Expressions for the FCass gate component
     const double fCass_inf = 0.4 + 0.6 / (1. + 400. * (Ca_ss * Ca_ss));
@@ -899,10 +872,7 @@ __global__ void step_RL(double *d_states, const double t, const double dt,
     const double dfCass_dt = (-fCass + fCass_inf) / tau_fCass;
     const double dfCass_dt_linearized = -1. / tau_fCass;
     d_states[padded_num_cells * STATE_fCass + thread_ind] =
-            (fabs(dfCass_dt_linearized) > 1.0e-8
-                     ? (-1.0 + exp(dt * dfCass_dt_linearized)) * dfCass_dt / dfCass_dt_linearized
-                     : dt * dfCass_dt)
-            + fCass;
+            (expm1(dt * dfCass_dt_linearized)) * dfCass_dt / dfCass_dt_linearized + fCass;
 
     // Expressions for the Calcium background current component
     const double i_b_Ca = g_bca * (-E_Ca + V);
@@ -919,10 +889,7 @@ __global__ void step_RL(double *d_states, const double t, const double dt,
     const double ds_dt = (-s + s_inf) / tau_s;
     const double ds_dt_linearized = -1. / tau_s;
     d_states[padded_num_cells * STATE_s + thread_ind] =
-            (fabs(ds_dt_linearized) > 1.0e-8
-                     ? (-1.0 + exp(dt * ds_dt_linearized)) * ds_dt / ds_dt_linearized
-                     : dt * ds_dt)
-            + s;
+            (expm1(dt * ds_dt_linearized)) * ds_dt / ds_dt_linearized + s;
 
     // Expressions for the r gate component
     const double r_inf = 1.0 / (1. + exp(10. / 3. - V / 6.));
@@ -930,10 +897,7 @@ __global__ void step_RL(double *d_states, const double t, const double dt,
     const double dr_dt = (-r + r_inf) / tau_r;
     const double dr_dt_linearized = -1. / tau_r;
     d_states[padded_num_cells * STATE_r + thread_ind] =
-            (fabs(dr_dt_linearized) > 1.0e-8
-                     ? (-1.0 + exp(dt * dr_dt_linearized)) * dr_dt / dr_dt_linearized
-                     : dt * dr_dt)
-            + r;
+            (expm1(dt * dr_dt_linearized)) * dr_dt / dr_dt_linearized + r;
 
     // Expressions for the Sodium potassium pump current component
     const double i_NaK =
@@ -968,240 +932,34 @@ __global__ void step_RL(double *d_states, const double t, const double dt,
     const double dCa_i_dt = (V_sr * (-i_up + i_leak) / V_c
                              - Cm * (-2. * i_NaCa + i_b_Ca + i_p_Ca) / (2. * F * V_c) + i_xfer)
                             * Ca_i_bufc;
-    const double dCa_i_bufc_dCa_i =
-            2. * Buf_c * K_buf_c
-            / (((1. + Buf_c * K_buf_c / ((K_buf_c + Ca_i) * (K_buf_c + Ca_i)))
-                * (1. + Buf_c * K_buf_c / ((K_buf_c + Ca_i) * (K_buf_c + Ca_i))))
-               * ((K_buf_c + Ca_i) * (K_buf_c + Ca_i) * (K_buf_c + Ca_i)));
-    const double dE_Ca_dCa_i = -0.5 * R * T / (F * Ca_i);
-    const double di_NaCa_dCa_i =
-            -K_NaCa * alpha * (Na_o * Na_o * Na_o) * exp(F * (-1. + gamma) * V / (R * T))
-            / ((1. + K_sat * exp(F * (-1. + gamma) * V / (R * T))) * (Ca_o + Km_Ca)
-               * ((Km_Nai * Km_Nai * Km_Nai) + (Na_o * Na_o * Na_o)));
-    const double di_p_Ca_dCa_i =
-            g_pCa / (K_pCa + Ca_i) - g_pCa * Ca_i / ((K_pCa + Ca_i) * (K_pCa + Ca_i));
-    const double di_up_dCa_i =
-            2. * Vmax_up * (K_up * K_up)
-            / (((1. + (K_up * K_up) / (Ca_i * Ca_i)) * (1. + (K_up * K_up) / (Ca_i * Ca_i)))
-               * (Ca_i * Ca_i * Ca_i));
-    const double dCa_i_dt_linearized =
-            (-V_xfer + V_sr * (-V_leak - di_up_dCa_i) / V_c
-             - Cm * (-2. * di_NaCa_dCa_i - g_bca * dE_Ca_dCa_i + di_p_Ca_dCa_i) / (2. * F * V_c))
-                    * Ca_i_bufc
-            + (V_sr * (-i_up + i_leak) / V_c
-               - Cm * (-2. * i_NaCa + i_b_Ca + i_p_Ca) / (2. * F * V_c) + i_xfer)
-                      * dCa_i_bufc_dCa_i;
-    d_states[padded_num_cells * STATE_Ca_i + thread_ind] =
-            Ca_i
-            + (fabs(dCa_i_dt_linearized) > 1.0e-8
-                       ? (-1.0 + exp(dt * dCa_i_dt_linearized)) * dCa_i_dt / dCa_i_dt_linearized
-                       : dt * dCa_i_dt);
+    d_states[padded_num_cells * STATE_Ca_i + thread_ind] = dt * dCa_i_dt + Ca_i;
     const double k1 = k1_prime / kcasr;
     const double k2 = k2_prime * kcasr;
     const double O = (Ca_ss * Ca_ss) * R_prime * k1 / (k3 + (Ca_ss * Ca_ss) * k1);
     const double dR_prime_dt = k4 * (1. - R_prime) - Ca_ss * R_prime * k2;
-    const double dR_prime_dt_linearized = -k4 - Ca_ss * k2;
-    d_states[padded_num_cells * STATE_R_prime + thread_ind] =
-            (fabs(dR_prime_dt_linearized) > 1.0e-8 ? (-1.0 + exp(dt * dR_prime_dt_linearized))
-                                                             * dR_prime_dt / dR_prime_dt_linearized
-                                                   : dt * dR_prime_dt)
-            + R_prime;
+    d_states[padded_num_cells * STATE_R_prime + thread_ind] = dt * dR_prime_dt + R_prime;
     const double i_rel = V_rel * (-Ca_ss + Ca_SR) * O;
     const double dCa_SR_dt = (-i_leak - i_rel + i_up) * Ca_sr_bufsr;
-    const double dCa_sr_bufsr_dCa_SR =
-            2. * Buf_sr * K_buf_sr
-            / (((1. + Buf_sr * K_buf_sr / ((K_buf_sr + Ca_SR) * (K_buf_sr + Ca_SR)))
-                * (1. + Buf_sr * K_buf_sr / ((K_buf_sr + Ca_SR) * (K_buf_sr + Ca_SR))))
-               * ((K_buf_sr + Ca_SR) * (K_buf_sr + Ca_SR) * (K_buf_sr + Ca_SR)));
-    const double dO_dk1 = (Ca_ss * Ca_ss) * R_prime / (k3 + (Ca_ss * Ca_ss) * k1)
-                          - pow(Ca_ss, 4.) * R_prime * k1
-                                    / ((k3 + (Ca_ss * Ca_ss) * k1) * (k3 + (Ca_ss * Ca_ss) * k1));
-    const double dk1_dkcasr = -k1_prime / (kcasr * kcasr);
-    const double dkcasr_dCa_SR =
-            -2. * (EC * EC) * (max_sr - min_sr)
-            / (((1. + (EC * EC) / (Ca_SR * Ca_SR)) * (1. + (EC * EC) / (Ca_SR * Ca_SR)))
-               * (Ca_SR * Ca_SR * Ca_SR));
-    const double di_rel_dCa_SR =
-            V_rel * O + V_rel * (-Ca_ss + Ca_SR) * dO_dk1 * dk1_dkcasr * dkcasr_dCa_SR;
-    const double di_rel_dO = V_rel * (-Ca_ss + Ca_SR);
-    const double dCa_SR_dt_linearized =
-            (-V_leak - di_rel_dCa_SR - dO_dk1 * di_rel_dO * dk1_dkcasr * dkcasr_dCa_SR)
-                    * Ca_sr_bufsr
-            + (-i_leak - i_rel + i_up) * dCa_sr_bufsr_dCa_SR;
-    d_states[padded_num_cells * STATE_Ca_SR + thread_ind] =
-            Ca_SR
-            + (fabs(dCa_SR_dt_linearized) > 1.0e-8
-                       ? (-1.0 + exp(dt * dCa_SR_dt_linearized)) * dCa_SR_dt / dCa_SR_dt_linearized
-                       : dt * dCa_SR_dt);
+    d_states[padded_num_cells * STATE_Ca_SR + thread_ind] = dt * dCa_SR_dt + Ca_SR;
     const double dCa_ss_dt =
             (V_sr * i_rel / V_ss - V_c * i_xfer / V_ss - Cm * i_CaL / (2. * F * V_ss))
             * Ca_ss_bufss;
-    const double dCa_ss_bufss_dCa_ss =
-            2. * Buf_ss * K_buf_ss
-            / (((1. + Buf_ss * K_buf_ss / ((K_buf_ss + Ca_ss) * (K_buf_ss + Ca_ss)))
-                * (1. + Buf_ss * K_buf_ss / ((K_buf_ss + Ca_ss) * (K_buf_ss + Ca_ss))))
-               * ((K_buf_ss + Ca_ss) * (K_buf_ss + Ca_ss) * (K_buf_ss + Ca_ss)));
-    const double dO_dCa_ss = -2. * (Ca_ss * Ca_ss * Ca_ss) * (k1 * k1) * R_prime
-                                     / ((k3 + (Ca_ss * Ca_ss) * k1) * (k3 + (Ca_ss * Ca_ss) * k1))
-                             + 2. * Ca_ss * R_prime * k1 / (k3 + (Ca_ss * Ca_ss) * k1);
-    const double di_CaL_factors_dCa_ss =
-            F * g_CaL * d * exp(2. * F * V_eff / (R * T)) * f * f2 * fCass;
-    const double di_rel_dCa_ss = -V_rel * O + V_rel * (-Ca_ss + Ca_SR) * dO_dCa_ss;
-    const double dCa_ss_dt_linearized =
-            (V_sr * (dO_dCa_ss * di_rel_dO + di_rel_dCa_ss) / V_ss - V_c * V_xfer / V_ss
-             - Cm * di_CaL_factors_dCa_ss * i_CaL_fraction / (2. * F * V_ss))
-                    * Ca_ss_bufss
-            + (V_sr * i_rel / V_ss - V_c * i_xfer / V_ss - Cm * i_CaL / (2. * F * V_ss))
-                      * dCa_ss_bufss_dCa_ss;
-    d_states[padded_num_cells * STATE_Ca_ss + thread_ind] =
-            Ca_ss
-            + (fabs(dCa_ss_dt_linearized) > 1.0e-8
-                       ? (-1.0 + exp(dt * dCa_ss_dt_linearized)) * dCa_ss_dt / dCa_ss_dt_linearized
-                       : dt * dCa_ss_dt);
+    d_states[padded_num_cells * STATE_Ca_ss + thread_ind] = dt * dCa_ss_dt + Ca_ss;
 
     // Expressions for the Sodium dynamics component
     const double dNa_i_dt = Cm * (-i_Na - i_b_Na - 3. * i_NaCa - 3. * i_NaK) / (F * V_c);
-    const double dE_Na_dNa_i = -R * T / (F * Na_i);
-    const double di_Na_dE_Na = -g_Na * (m * m * m) * h * j;
-    const double di_NaCa_dNa_i =
-            3. * Ca_o * K_NaCa * (Na_i * Na_i) * exp(F * gamma * V / (R * T))
-            / ((1. + K_sat * exp(F * (-1. + gamma) * V / (R * T))) * (Ca_o + Km_Ca)
-               * ((Km_Nai * Km_Nai * Km_Nai) + (Na_o * Na_o * Na_o)));
-    const double di_NaK_dNa_i = K_o * P_NaK
-                                        / ((K_mNa + Na_i) * (K_mk + K_o)
-                                           * (1. + 0.0353 * exp(-F * V / (R * T))
-                                              + 0.1245 * exp(-0.1 * F * V / (R * T))))
-                                - K_o * P_NaK * Na_i
-                                          / (((K_mNa + Na_i) * (K_mNa + Na_i)) * (K_mk + K_o)
-                                             * (1. + 0.0353 * exp(-F * V / (R * T))
-                                                + 0.1245 * exp(-0.1 * F * V / (R * T))));
-    const double dNa_i_dt_linearized = Cm
-                                       * (-3. * di_NaCa_dNa_i - 3. * di_NaK_dNa_i
-                                          + g_bna * dE_Na_dNa_i - dE_Na_dNa_i * di_Na_dE_Na)
-                                       / (F * V_c);
-    d_states[padded_num_cells * STATE_Na_i + thread_ind] =
-            Na_i
-            + (fabs(dNa_i_dt_linearized) > 1.0e-8
-                       ? (-1.0 + exp(dt * dNa_i_dt_linearized)) * dNa_i_dt / dNa_i_dt_linearized
-                       : dt * dNa_i_dt);
+    d_states[padded_num_cells * STATE_Na_i + thread_ind] = dt * dNa_i_dt + Na_i;
 
     // Expressions for the Membrane component
     const double i_Stim = (is_stimulated ? -stim_amplitude : 0.);
     const double dV_dt = -i_CaL - i_K1 - i_Kr - i_Ks - i_Na - i_NaCa - i_NaK - i_Stim - i_b_Ca
                          - i_b_Na - i_p_Ca - i_p_K - i_to;
-    const double dalpha_K1_dV = -3.68652741199693e-8 * exp(0.06 * V - 0.06 * E_K)
-                                / ((1. + 6.14421235332821e-6 * exp(0.06 * V - 0.06 * E_K))
-                                   * (1. + 6.14421235332821e-6 * exp(0.06 * V - 0.06 * E_K)));
-    const double dbeta_K1_dV =
-            (0.000612120804016053 * exp(0.0002 * V - 0.0002 * E_K)
-             + 0.0367879441171442 * exp(0.1 * V - 0.1 * E_K))
-                    / (1. + exp(0.5 * E_K - 0.5 * V))
-            + 0.5
-                      * (0.367879441171442 * exp(0.1 * V - 0.1 * E_K)
-                         + 3.06060402008027 * exp(0.0002 * V - 0.0002 * E_K))
-                      * exp(0.5 * E_K - 0.5 * V)
-                      / ((1. + exp(0.5 * E_K - 0.5 * V)) * (1. + exp(0.5 * E_K - 0.5 * V)));
-    const double di_CaL_factors_dV_eff = 2. * g_CaL * (F * F) * Ca_ss * d
-                                         * exp(2. * F * V_eff / (R * T)) * f * f2 * fCass / (R * T);
-    const double di_CaL_fraction_dV_eff =
-            (fabs(V_eff) < i_CaL_lim_delta
-                     ? 0.
-                     : F / (R * T * (-1. + exp(2. * F * V_eff / (R * T))))
-                               - 2. * (F * F) * V_eff * exp(2. * F * V_eff / (R * T))
-                                         / ((R * R) * (T * T)
-                                            * ((-1. + exp(2. * F * V_eff / (R * T)))
-                                               * (-1. + exp(2. * F * V_eff / (R * T))))));
-    const double dxK1_inf_dalpha_K1 =
-            1.0 / (alpha_K1 + beta_K1) - alpha_K1 / ((alpha_K1 + beta_K1) * (alpha_K1 + beta_K1));
-    const double dxK1_inf_dbeta_K1 = -alpha_K1 / ((alpha_K1 + beta_K1) * (alpha_K1 + beta_K1));
-    const double di_K1_dV =
-            0.430331482911935 * g_K1 * sqrt(K_o) * xK1_inf
-            + 0.430331482911935 * g_K1 * sqrt(K_o) * (-E_K + V)
-                      * (dalpha_K1_dV * dxK1_inf_dalpha_K1 + dbeta_K1_dV * dxK1_inf_dbeta_K1);
-    const double di_K1_dxK1_inf = 0.430331482911935 * g_K1 * sqrt(K_o) * (-E_K + V);
-    const double di_Kr_dV = 0.430331482911935 * g_Kr * sqrt(K_o) * Xr1 * Xr2;
-    const double di_Ks_dV = g_Ks * (Xs * Xs);
-    const double di_Na_dV = g_Na * (m * m * m) * h * j;
-    const double di_NaCa_dV =
-            K_NaCa
-                    * (Ca_o * F * gamma * (Na_i * Na_i * Na_i) * exp(F * gamma * V / (R * T))
-                               / (R * T)
-                       - F * alpha * (Na_o * Na_o * Na_o) * (-1. + gamma) * Ca_i
-                                 * exp(F * (-1. + gamma) * V / (R * T)) / (R * T))
-                    / ((1. + K_sat * exp(F * (-1. + gamma) * V / (R * T))) * (Ca_o + Km_Ca)
-                       * ((Km_Nai * Km_Nai * Km_Nai) + (Na_o * Na_o * Na_o)))
-            - F * K_NaCa * K_sat * (-1. + gamma)
-                      * (Ca_o * (Na_i * Na_i * Na_i) * exp(F * gamma * V / (R * T))
-                         - alpha * (Na_o * Na_o * Na_o) * Ca_i
-                                   * exp(F * (-1. + gamma) * V / (R * T)))
-                      * exp(F * (-1. + gamma) * V / (R * T))
-                      / (R * T
-                         * ((1. + K_sat * exp(F * (-1. + gamma) * V / (R * T)))
-                            * (1. + K_sat * exp(F * (-1. + gamma) * V / (R * T))))
-                         * (Ca_o + Km_Ca) * ((Km_Nai * Km_Nai * Km_Nai) + (Na_o * Na_o * Na_o)));
-    const double di_NaK_dV =
-            K_o * P_NaK
-            * (0.0353 * F * exp(-F * V / (R * T)) / (R * T)
-               + 0.01245 * F * exp(-0.1 * F * V / (R * T)) / (R * T))
-            * Na_i
-            / ((K_mNa + Na_i) * (K_mk + K_o)
-               * ((1. + 0.0353 * exp(-F * V / (R * T)) + 0.1245 * exp(-0.1 * F * V / (R * T)))
-                  * (1. + 0.0353 * exp(-F * V / (R * T)) + 0.1245 * exp(-0.1 * F * V / (R * T)))));
-    const double di_p_K_dV = g_pK / (1. + exp(1250. / 299. - 50. * V / 299.))
-                             + 50. * g_pK * (-E_K + V) * exp(1250. / 299. - 50. * V / 299.)
-                                       / (299.
-                                          * ((1. + exp(1250. / 299. - 50. * V / 299.))
-                                             * (1. + exp(1250. / 299. - 50. * V / 299.))));
-    const double di_to_dV = g_to * r * s;
-    const double dV_dt_linearized =
-            -g_bca - g_bna - di_K1_dV - di_Kr_dV - di_Ks_dV - di_NaCa_dV - di_NaK_dV - di_Na_dV
-            - di_p_K_dV - di_to_dV
-            - (dalpha_K1_dV * dxK1_inf_dalpha_K1 + dbeta_K1_dV * dxK1_inf_dbeta_K1) * di_K1_dxK1_inf
-            - di_CaL_factors_dV_eff * i_CaL_fraction - di_CaL_fraction_dV_eff * i_CaL_factors;
-    d_states[padded_num_cells * STATE_V + thread_ind] =
-            (fabs(dV_dt_linearized) > 1.0e-8
-                     ? (-1.0 + exp(dt * dV_dt_linearized)) * dV_dt / dV_dt_linearized
-                     : dt * dV_dt)
-            + V;
+    d_states[padded_num_cells * STATE_V + thread_ind] = dt * dV_dt + V;
 
     // Expressions for the Potassium dynamics component
     const double dK_i_dt =
             Cm * (-i_K1 - i_Kr - i_Ks - i_Stim - i_p_K - i_to + 2. * i_NaK) / (F * V_c);
-    const double dE_K_dK_i = -R * T / (F * K_i);
-    const double dE_Ks_dK_i = -R * T / (F * (P_kna * Na_i + K_i));
-    const double dalpha_K1_dE_K = 3.68652741199693e-8 * exp(0.06 * V - 0.06 * E_K)
-                                  / ((1. + 6.14421235332821e-6 * exp(0.06 * V - 0.06 * E_K))
-                                     * (1. + 6.14421235332821e-6 * exp(0.06 * V - 0.06 * E_K)));
-    const double dbeta_K1_dE_K =
-            (-0.000612120804016053 * exp(0.0002 * V - 0.0002 * E_K)
-             - 0.0367879441171442 * exp(0.1 * V - 0.1 * E_K))
-                    / (1. + exp(0.5 * E_K - 0.5 * V))
-            - 0.5
-                      * (0.367879441171442 * exp(0.1 * V - 0.1 * E_K)
-                         + 3.06060402008027 * exp(0.0002 * V - 0.0002 * E_K))
-                      * exp(0.5 * E_K - 0.5 * V)
-                      / ((1. + exp(0.5 * E_K - 0.5 * V)) * (1. + exp(0.5 * E_K - 0.5 * V)));
-    const double di_K1_dE_K =
-            -0.430331482911935 * g_K1 * sqrt(K_o) * xK1_inf
-            + 0.430331482911935 * g_K1 * sqrt(K_o) * (-E_K + V)
-                      * (dalpha_K1_dE_K * dxK1_inf_dalpha_K1 + dbeta_K1_dE_K * dxK1_inf_dbeta_K1);
-    const double di_Kr_dE_K = -0.430331482911935 * g_Kr * sqrt(K_o) * Xr1 * Xr2;
-    const double di_Ks_dE_Ks = -g_Ks * (Xs * Xs);
-    const double di_p_K_dE_K = -g_pK / (1. + exp(1250. / 299. - 50. * V / 299.));
-    const double di_to_dE_K = -g_to * r * s;
-    const double dK_i_dt_linearized =
-            Cm
-            * (-(dE_K_dK_i * dalpha_K1_dE_K * dxK1_inf_dalpha_K1
-                 + dE_K_dK_i * dbeta_K1_dE_K * dxK1_inf_dbeta_K1)
-                       * di_K1_dxK1_inf
-               - dE_K_dK_i * di_K1_dE_K - dE_K_dK_i * di_Kr_dE_K - dE_K_dK_i * di_p_K_dE_K
-               - dE_K_dK_i * di_to_dE_K - dE_Ks_dK_i * di_Ks_dE_Ks)
-            / (F * V_c);
-    d_states[padded_num_cells * STATE_K_i + thread_ind] =
-            K_i
-            + (fabs(dK_i_dt_linearized) > 1.0e-8
-                       ? (-1.0 + exp(dt * dK_i_dt_linearized)) * dK_i_dt / dK_i_dt_linearized
-                       : dt * dK_i_dt);
+    d_states[padded_num_cells * STATE_K_i + thread_ind] = dt * dK_i_dt + K_i;
 }
 
 // Compute a forward step using the generalised Rush-Larsen (GRL1) scheme to the
