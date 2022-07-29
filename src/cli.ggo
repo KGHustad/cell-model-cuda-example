@@ -1,0 +1,31 @@
+# Name of your program
+package "cell_model_cuda_example" # don't use package if you're using automake
+# Version of your program
+version "0.1"   # don't use version if you're using automake
+
+# Options
+option  "num_cells" N "number of cells (independent instances of the ODE system)"
+        double
+        default="1E7"
+        optional
+
+option  "num_timesteps" t "number of time steps"
+        int
+        default="100"
+        optional
+
+option  "dt" - "time step (in ms) used to solve the cell model"
+        double
+        default="0.001"
+        optional
+
+option  "device_id" i "CUDA device to use"
+        int
+        default="0"
+        optional
+
+option  "scheme" s "numerical scheme used to solve the cell model"
+        values="FE","RL","GRL1"
+        default="FE"
+        enum
+        optional
