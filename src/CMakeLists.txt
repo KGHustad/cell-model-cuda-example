@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.9...3.22 FATAL_ERROR)
 
 project(cell-model-cuda-example LANGUAGES CUDA C CXX)
 
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
+include(BuildType)
+
 set(CUDA_ARCH_MINIMUM 35)
 set(CUDA_ARCH_FLAGS "")
 set(CUDA_GENCODE_FLAGS "")
@@ -49,6 +53,9 @@ else()
     # CMake >= 3.18 wants to set the flags itself
     set(CMAKE_CUDA_ARCHITECTURES ${CUDA_ARCHS})
 endif()
+
+set(CMAKE_CUDA_FLAGS_RELEASE "-O3 ${CUDA_ARCH_FLAGS} ${CUDA_GENCODE_FLAGS}")
+set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELEASE} -g")
 
 add_executable(TP06
     cli.c
